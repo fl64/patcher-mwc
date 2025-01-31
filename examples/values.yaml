@@ -23,25 +23,28 @@ webhook:
   failurePolicy: Fail
   rules:
       - operations: [ "CREATE", "UPDATE" ]
-        apiGroups: ["*"]
-        apiVersions: ["*"]
-        resources: ["pods"]
+        apiGroups: ["internal.virtualization.deckhouse.io"]
+        apiVersions: ["v1"]
+        resources: ["internalvirtualizationvirtualmachines"]
   namespaceSelector: {}
-  objectSelector:
-    matchExpressions:
-      - key: app
-        operator: "Exists"
+  objectSelector: {}
+    # matchExpressions:
+    #   - key: kubevirt.internal.virtualization.deckhouse.io
+    #     operator: "Exists"
 
 config:
   mutations:
-    - resource:
-        group: ""
-        version: v1
-        kind: Pod
-      patches:
-      - op: add
-        path: /metadata/labels/example.com~1added
-        value: "yes"
+  - resource:
+      group: internal.virtualization.deckhouse.io
+      version: v1
+      kind: InternalVirtualizationVirtualMachine
+    patches:
+    - op: replace
+      path: /spec/template/spec/domain/cpu/cores
+      value: 16
+    - op: replace
+      path: /spec/template/spec/domain/cpu/sockets
+      value: 4
 
 
 resources:

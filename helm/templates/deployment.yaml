@@ -27,9 +27,9 @@ spec:
             - name: mwc-app-port
               containerPort: 8443
               protocol: TCP
-            - name: mwc-mon-port
-              containerPort: 8443
-              protocol: TCP
+            # - name: mwc-mon-port
+            #   containerPort: 8443
+            #   protocol: TCP
           # livenessProbe:
           #   httpGet:
           #     scheme: HTTP
