@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "patcher-mwc.fullname" . }}
+  labels:
+    {{- include "patcher-mwc.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "patcher-mwc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "patcher-mwc.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: mwc-app-port
+              containerPort: 8443
+              protocol: TCP
+            - name: mwc-mon-port
+              containerPort: 8443
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     scheme: HTTP
+          #     path: /health
+          #     port: mwc-mon-port
+          # readinessProbe:
+          #   httpGet:
+          #     scheme: HTTP
+          #     path: /health
+          #     port: mwc-mon-port
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: mwc-certs
+              mountPath: /tls
+              readOnly: true
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: mwc-certs
+          secret:
+            secretName: {{ include "patcher-mwc.fullname" . }}
+        - name: config
+          configMap:
+            name: {{ include "patcher-mwc.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

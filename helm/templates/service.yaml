@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "patcher-mwc.fullname" . }}
+  labels:
+    {{- include "patcher-mwc.labels" . | nindent 4 }}
+  {{- with .Values.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 443
+      targetPort: mwc-app-port
+      protocol: TCP
+  selector:
+    {{- include "patcher-mwc.selectorLabels" . | nindent 4 }}

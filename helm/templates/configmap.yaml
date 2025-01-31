@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "patcher-mwc.fullname" . }}
+  labels:
+    {{- include "patcher-mwc.labels" . | nindent 4 }}
+data:
+  # file-like keys
+  config.yaml: |
+    mutations:
+    - resource:
+        group: ""
+        version: v1
+        kind: Pod
+      patches:
+      - op: add
+        path: /metadata/labels/example.com~1added
+        value: "yes"

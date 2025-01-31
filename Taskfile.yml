@@ -1,0 +1,33 @@
+# https://taskfile.dev
+
+version: '3'
+
+
+tasks:
+  mkcert:
+    cmds:
+      - mkcert -cert-file ./testdata/tls.crt -key-file ./testdata/tls.key 127.0.0.1
+  test:
+    cmds:
+      - curl https://127.0.0.1:8443/healthz
+    silent: true
+  run:
+    deps:
+    - mkcert
+    cmds:
+      - go run . -config ./testdata/config.yaml -tls-cert ./testdata/tls.crt -tls-key ./testdata/tls.key
+    silent: true
+
+  helm-template:
+    cmds:
+      - helm template ./helm -f ./helm/values.yaml
+    silent: true
+  werf:
+    werf build --repo fl64/patcher-mwc --add-custom-tag=latest
+  install:
+    cmds:
+    - kubectl create namespace pmwc || true
+    - helm upgrade --install pmwc ./helm -n pmwc
+  uninstall:
+    cmds:
+    - helm uninstall -n pmwc pmwc

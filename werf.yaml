@@ -1,0 +1,41 @@
+---
+project: patcher-mwc
+configVersion: 1
+gitWorktree:
+  forceShallowClone: true
+---
+image: golang-builder
+from: golang:1.23.5-bookworm
+final: false
+git:
+- add: /
+  to: /usr/local/go/src/patcher-mwc
+  stageDependencies:
+    install:
+      - '**/*'
+shell:
+  install:
+  - cd /usr/local/go/src/patcher-mwc
+  - go mod download
+  - export GO111MODULE=on
+  - export GOOS=linux
+  - export CGO_ENABLED=0
+  - go build -v -ldflags "-w -s -X 'main.BuildDatetime=$(date --iso-8601=seconds)'" -o patcher-mwc ./main.go
+---
+image: fl64/patcher-mwc
+from: alpine:3.17
+import:
+- image: golang-builder
+  add: /usr/local/go/src/patcher-mwc/patcher-mwc
+  to: /app/patcher-mwc
+  after: install
+# shell:
+#   beforeInstall:
+#   - apk add --no-cache  jq iproute2 bind-tools --no-cache
+docker:
+  EXPOSE: "8443"
+  WORKDIR: "/app"
+  ENTRYPOINT: ["/app/patcher-mwc"]
+  LABEL:
+    maintainer: "flsixtyfour@gmail.com"
+    org.label-schema.vcs-url: "https://github.com/fl64/patcher-mwc"

@@ -1,0 +1,9 @@
+mutations:
+- resource:
+    group: ""
+    version: v1
+    kind: Pod
+  patches:
+  - op: add
+    path: /metadata/labels/example.com~1added
+    value: "yes"
