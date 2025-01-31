@@ -21,11 +21,29 @@ serviceAnnotations: {}
 
 webhook:
   failurePolicy: Fail
+  rules:
+      - operations: [ "CREATE", "UPDATE" ]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["internalvirtualizationvirtualmachines"]
   namespaceSelector: {}
-  objectSelector:
-    matchExpressions:
-      - key: kubevirt.internal.virtualization.deckhouse.io
-        operator: "Exists"
+  objectSelector: {}
+    # matchExpressions:
+    #   - key: kubevirt.internal.virtualization.deckhouse.io
+    #     operator: "Exists"
+
+config:
+  mutations:
+  - resource:
+      group: internal.virtualization.deckhouse.io
+      version: v1
+      kind: InternalVirtualizationVirtualMachine
+    patches:
+    - op: replace
+      path: /spec/template/spec/domain/cpu/cores
+      value: "7"
+
+
 
 resources:
   limits:

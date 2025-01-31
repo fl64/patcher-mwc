@@ -29,10 +29,9 @@ webhooks:
         path: "/mutate"
       caBundle: {{ $ca.Cert | b64enc | quote }}
     rules:
-      - operations: [ "CREATE", "UPDATE" ]
-        apiGroups: ["*"]
-        apiVersions: ["*"]
-        resources: ["pods"]
+      {{- with .Values.webhook.namespaceSelector }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
     namespaceSelector:
       {{- with .Values.webhook.namespaceSelector }}
       {{- toYaml . | nindent 6 }}

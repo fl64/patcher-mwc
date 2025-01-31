@@ -10,10 +10,12 @@ spec:
       {{- include "patcher-mwc.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/wh: {{ include (print $.Template.BasePath "/webhook_bundle.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
       labels:
         {{- include "patcher-mwc.selectorLabels" . | nindent 8 }}
     spec:
