@@ -2,6 +2,8 @@
 
 version: '3'
 
+vars:
+  values: ./examples/values-add-sa.yaml
 
 tasks:
   mkcert:
@@ -20,14 +22,14 @@ tasks:
 
   helm-template:
     cmds:
-      - helm template ./helm -f ./helm/values.yaml
+      - helm template ./helm -f {{ .values }}
     silent: true
   werf:
     werf build --repo fl64/patcher-mwc --add-custom-tag=latest
   install:
     cmds:
     - kubectl create namespace pmwc || true
-    - helm upgrade --install pmwc ./helm -n pmwc
+    - helm upgrade --install pmwc ./helm -n pmwc -f {{ .values }}
   uninstall:
     cmds:
     - helm uninstall -n pmwc pmwc
