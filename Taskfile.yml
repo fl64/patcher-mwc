@@ -3,7 +3,7 @@
 version: '3'
 
 vars:
-  values: ./examples/values-add-sa.yaml
+  values: ./examples/values-add-audio.yaml
 
 tasks:
   mkcert:

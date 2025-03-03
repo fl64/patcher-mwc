@@ -1,0 +1,68 @@
+# Default values for mwc-demo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+debug: true
+
+image:
+  repository: fl64/patcher-mwc
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+podAnnotations: {}
+
+serviceAnnotations: {}
+
+webhook:
+  failurePolicy: Fail
+  rules:
+      - operations: [ "CREATE"]
+        apiGroups: ["internal.virtualization.deckhouse.io"]
+        apiVersions: ["v1"]
+        resources: ["internalvirtualizationvirtualmachineinstances"]
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: "In"
+        values: ["demo-db"]
+  objectSelector: {}
+    # matchExpressions:
+    #   - key: kubevirt.internal.virtualization.deckhouse.io
+    #     operator: "Exists"
+
+config:
+  mutations:
+  - resource:
+      group: internal.virtualization.deckhouse.io
+      version: v1
+      kind: InternalVirtualizationVirtualMachineInstance
+    patches:
+    - op: add
+      path: /spec/domain/devices/hostDevices
+      value: []
+    - op: add
+      path: /spec/domain/devices/hostDevices/-
+      value:
+        name: audio
+        deviceName: devices.kubevirt.io/audio
+
+
+resources:
+  limits:
+    cpu: 20m
+    memory: 64Mi
+  requests:
+    cpu: 20m
+    memory: 64Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
